@@ -10,9 +10,20 @@ import UIKit
 
 class ViewController: UIViewController {
 
+    @IBOutlet weak var cityLabel: UITextField!
+    
+    @IBOutlet weak var infoLabel: UILabel!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        let url = URL(string: "http://api.openweathermap.org/data/2.5/weather?q=London,uk&APPID=0637c9d91efa3d498e8fda2f4540e4f4")!
+        
+        
+        // Do any additional setup after loading the view.
+    }
+
+    @IBAction func selectBtn(_ sender: Any)
+    {
+        let url = URL(string: "http://api.openweathermap.org/data/2.5/weather?q=\(cityLabel.text!.replacingOccurrences(of: " ", with: "%20"))&APPID=0637c9d91efa3d498e8fda2f4540e4f4")!
         
         let task = URLSession.shared.dataTask(with: url)
         {
@@ -28,7 +39,15 @@ class ViewController: UIViewController {
                     do{
                         
                         let jsonResult = try JSONSerialization.jsonObject(with: urlContent, options: JSONSerialization.ReadingOptions.mutableContainers) as?  NSDictionary
-                        print(jsonResult)
+                        //print(jsonResult)
+                        if let description = ((jsonResult?["weather"] as? NSArray)?[0] as? NSDictionary)?["description"] as? String
+                        {
+                            print(description)
+                            DispatchQueue.main.async {
+                                self.infoLabel.text = description
+                            }
+                            
+                        }
                         
                         
                     }catch
@@ -41,9 +60,7 @@ class ViewController: UIViewController {
         //start the task
         task.resume()
         
-        // Do any additional setup after loading the view.
     }
-
-
+    
 }
 
